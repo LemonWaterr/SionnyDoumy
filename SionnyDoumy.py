@@ -1,9 +1,8 @@
 import os
 import sys
 import tkinter
-from tkinter.filedialog import askopenfilename
 import customtkinter
-import openpyxl as xl
+from tkinter.filedialog import askopenfilename
 from StockInfo import StockInfo
 
 root = customtkinter.CTk()
@@ -54,9 +53,11 @@ class App(customtkinter.CTk):
         self.order_file_path_text.grid(row=1, column=0, padx=(10, 5), pady=(20, 20))
         self.order_file_path_search_button = customtkinter.CTkButton(self.tabview.tab("재고체크"), width=30, height=30, text="...", command=self.set_order_path)
         self.order_file_path_search_button.grid(row=1, column=1, padx=(5, 10), pady=(5, 5))
+        
         # row 2
-        self.file_check_button = customtkinter.CTkButton(self.tabview.tab("재고체크"), width=30, height=30, text="파일 검토 (검토 후 문서 생성 가능)", command=self.evaluate_files, state='disabled')
+        self.file_check_button = customtkinter.CTkButton(self.tabview.tab("재고체크"), width=30, height=30, text="새주문 & 바잉리스트 템플릿 생성", command=self.execute_stock_order, state='disabled')
         self.file_check_button.grid(row=2, column=0, columnspan=2, padx=(100, 100), pady=(30, 30))
+        '''
         # row 3
         self.buttonsFrame = customtkinter.CTkFrame(self.tabview.tab("재고체크"), width=700, height=230)
         self.buttonsFrame.grid_rowconfigure(0, weight=1)
@@ -66,6 +67,7 @@ class App(customtkinter.CTk):
         self.highlight_maker_button.grid(row=0, column=0, padx=(100, 50), pady=(30, 30))
         self.buying_list_maker_button = customtkinter.CTkButton(self.buttonsFrame, width=200, height=100, text="바잉리스트 문서 생성", command=self.make_buying_list_file, state='disabled')
         self.buying_list_maker_button.grid(row=0, column=1, padx=(50, 100), pady=(30, 30))
+        '''
 
         self.tabview.add("영수증입출고")
         self.tabview.tab("영수증입출고").grid_columnconfigure(0, weight=1)
@@ -101,29 +103,22 @@ class App(customtkinter.CTk):
         self.order_file_path_text.configure(text=os.path.abspath(self.order_file_path))
         self.check_and_enable_file_check_button()
 
-    def evaluate_files(self):
+    def execute_stock_order(self):
 
-        self.printt("재고체크: 파일들을 읽어오는 중입니다...")
         try:
             self.stock_info = StockInfo(self.stock_file_path, self.order_file_path)
+            self.stock_info.execute()
 
-            self.printt("\n재고체크: 재고가 있는 새주문 상품코드")
-            for code in self.stock_info.get_new_order_existing_stocks():
-                self.printt(code)
+            self.printt("\n새주문 & 바잉리스트 완료.")
 
-            self.printt("\n재고체크: 재고가 없는 새주문 상품코드")
-            for code in self.stock_info.get_new_order_missing_stocks():
-                self.printt(code)
-
-            self.printt("\n재고체크: 파일을 모두 읽어왔습니다. 새주문 파일을 만들 수 있습니다.")
-
-            self.highlight_maker_button.configure(state="normal")
-            self.buying_list_maker_button.configure(state="normal")
+            #self.highlight_maker_button.configure(state="normal")
+            #self.buying_list_maker_button.configure(state="normal")
         except Exception as e:
-            self.highlight_maker_button.configure(state="disabled")
-            self.buying_list_maker_button.configure(state="disabled")
+            #self.highlight_maker_button.configure(state="disabled")
+            #self.buying_list_maker_button.configure(state="disabled")
             self.printt(str(e))
 
+    '''
     def make_new_order_file(self):
         self.printt("재고체크: 하이라이트된 문서 생성중입니다...")
         try:
@@ -134,8 +129,7 @@ class App(customtkinter.CTk):
 
     def make_buying_list_file(self):
         self.printt("재고체크: 바잉리스트 문서 생성은 아직 지원되지 않습니다.")
-
-
+    '''
 
 if __name__ == "__main__":
     app = App()
