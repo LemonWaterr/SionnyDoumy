@@ -1,0 +1,1 @@
+pyinstaller --noconfirm --onedir --windowed --add-data "c:\users\1004w\appdata\local\programs\python\python310\lib\site-packages/customtkinter;customtkinter/"  "C:\Users\1004w\Documents\develop\SionnyDoumy\SionnyDoumy.py"

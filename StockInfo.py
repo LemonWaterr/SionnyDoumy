@@ -9,7 +9,7 @@ STOCK_KEY = '상품코드'
 STOCK_LABELS = ['한글상품명', '색상', '옵션']
 ORDER_KEY = '상품주문번호'
 BUYING_LABELS = [
-    '재고', '발송기한', '상품주문번호', '수령자', '주문일자', '카운터', '주문상태', '배송GBP', '수량', '옵션', '상품코드', '원주문', '결제금액',
+    '재고', '발송기한', '상품주문번호', '수령자', '주문일자', '카운터', '주문상태', '배송GBP', '이미지', '수량', '옵션', '상품코드', '원주문', '결제금액',
     # optional
     '주문번호', '주문메모', '배송메모', '상담메모', '원산지', '주문자ID', '전화번호', '핸드폰번호', '상품금액', '#', '주소', '우편번호', '개인통관부호', '배송메시지', '브랜드', '품목', '일반품목'
 ]
@@ -20,6 +20,7 @@ class CellFormat():
         self.fill = copy(fill)
 
 LABEL_FORMAT = CellFormat(Font(bold=True, color="FFFFFF"), PatternFill("solid", fgColor="000000"))
+DEFAULT_FORMAT = CellFormat(Font(), PatternFill())
 
 
 class StockInfo():
@@ -99,8 +100,14 @@ class StockInfo():
             try:
                 if row_count == 1:
                     labels = [str(cell).replace(' ', '') for cell in row]
-                    val_indices = [labels.index(col) for col in BUYING_LABELS]
-                    self.buying_data.append([(label, LABEL_FORMAT) for label in BUYING_LABELS])
+                    val_indices = []
+                    buying_data_labels_row = []
+                    for label in BUYING_LABELS:
+                        buying_data_labels_row.append((label, LABEL_FORMAT))
+                        if label == '이미지':
+                            continue
+                        val_indices.append(labels.index(label))
+                    self.buying_data.append(buying_data_labels_row)
                     continue
                 
                 if row[0] == None:
@@ -129,11 +136,17 @@ class StockInfo():
 
     def build_buying_row_data(self, worksheet, val_indices, row_raw):
         row_data = []
+        column_count = 0
         for i in val_indices:
+            if column_count == 8:
+                # add column for images
+                row_data.append((' ', DEFAULT_FORMAT))
+                self.buying_col_dimensions.append(26.5)
             value = row_raw[i].value
             format = CellFormat(row_raw[i].font, row_raw[i].fill)
             row_data.append((value, format))
             self.buying_col_dimensions.append(worksheet.column_dimensions[get_column_letter(i+1)].width)
+            column_count += 1
         return row_data
             
 
