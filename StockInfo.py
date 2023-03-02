@@ -1,8 +1,8 @@
 import openpyxl as xl
 from openpyxl.styles import PatternFill, Font
+from openpyxl.utils import get_column_letter
 from datetime import date
 from copy import copy
-from Utils import int_to_column_letter
 
 # column names CANNOT INCLUDE WHITESPACES
 STOCK_KEY = '상품코드'
@@ -133,13 +133,19 @@ class StockInfo():
             value = row_raw[i].value
             format = CellFormat(row_raw[i].font, row_raw[i].fill)
             row_data.append((value, format))
-            self.buying_col_dimensions.append(worksheet.column_dimensions[int_to_column_letter(i+1)].width)
+            self.buying_col_dimensions.append(worksheet.column_dimensions[get_column_letter(i+1)].width)
         return row_data
             
 
     def make_buying_list(self):
         buying_list_workbook = xl.Workbook(write_only=True)
         buying_list_worksheet = buying_list_workbook.create_sheet('바잉리스트')
+
+        # set dimensions - this MUST be done before adding cells
+        for i in range(0, len(BUYING_LABELS)):
+            col_i = i+1
+            width = self.buying_col_dimensions[i]
+            buying_list_worksheet.column_dimensions[get_column_letter(col_i)].width = width
 
         # append cells
         for row_data in self.buying_data:
@@ -150,12 +156,6 @@ class StockInfo():
                 cell.fill = cell_data[1].fill
                 row.append(cell)
             buying_list_worksheet.append(row)
-
-        # set dimensions
-        for i in range(0, len(BUYING_LABELS)):
-            col_i = i+1
-            width = self.buying_col_dimensions[i]
-            buying_list_worksheet.column_dimensions[int_to_column_letter(col_i)].width = 77.0
 
         buying_list_workbook.save(f'{self.get_mmdd()} 바잉리스트.xlsx')
 

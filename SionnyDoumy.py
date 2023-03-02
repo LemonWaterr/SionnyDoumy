@@ -1,10 +1,8 @@
 import os
 import sys
 import tkinter
-from tkinter.filedialog import askopenfilename
 import customtkinter
-import openpyxl as xl
-from openpyxl.utils import get_column_letter
+from tkinter.filedialog import askopenfilename
 from StockInfo import StockInfo
 
 root = customtkinter.CTk()
